@@ -9,9 +9,10 @@ type User struct {
 	LastName         string    `json:"lastName"`
 	SecondLastName   string    `json:"secondLastName"`
 	Email            string    `json:"email"`
-	Password         string    `json:"password"`
+	SecondaryEmail   *string   `json:"secondaryEmail,omitempty"`
+	Password         *string   `json:"password,omitempty"`
 	RegistrationDate time.Time `json:"registrationDate"`
 	RoleID           int       `json:"roleId"`
-	OAuthProvider    string    `json:"oauthProvider"`
-	OAuthID          string    `json:"oauthId"`
+	OAuthProvider    *string   `json:"oauthProvider,omitempty"`
+	OAuthID          *string   `json:"oauthId,omitempty"`
 }
