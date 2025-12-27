@@ -1,6 +1,7 @@
 package cloudinary
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -11,23 +12,36 @@ import (
 var CloudinaryInstance *cloudinary.Cloudinary
 
 func InitCloudinary() {
+	fmt.Println("=== INICIANDO CLOUDINARY ===")
+
 	if err := godotenv.Load(); err != nil {
-		log.Printf("Advertencia: No se pudo cargar .env para Cloudinary: %v", err)
+		log.Printf("Advertencia: No se pudo cargar .env: %v", err)
 	}
 
 	cloudName := os.Getenv("CLOUDINARY_NAME")
 	apiKey := os.Getenv("API_KEY")
 	apiSecret := os.Getenv("API_SECRET")
 
-	if cloudName == "" || apiKey == "" || apiSecret == "" {
-		log.Fatal("Error: CLOUDINARY_NAME, API_KEY o API_SECRET no están configurados")
+	fmt.Printf("CLOUDINARY_NAME: '%s'\n", cloudName)
+	fmt.Printf("API_KEY: '%s'\n", apiKey)
+	fmt.Printf("API_SECRET (primeros 5 chars): '%s...'\n", apiSecret[:5])
+
+	if cloudName == "" {
+		log.Fatal("ERROR: CLOUDINARY_NAME vacío")
+	}
+	if apiKey == "" {
+		log.Fatal("ERROR: API_KEY vacío")
+	}
+	if apiSecret == "" {
+		log.Fatal("ERROR: API_SECRET vacío")
 	}
 
+	fmt.Println("Creando instancia de Cloudinary...")
 	cld, err := cloudinary.NewFromParams(cloudName, apiKey, apiSecret)
 	if err != nil {
-		log.Fatalf("Error al inicializar Cloudinary: %v", err)
+		log.Fatalf("ERROR al crear instancia: %v", err)
 	}
 
 	CloudinaryInstance = cld
-	log.Println("Cloudinary configurado correctamente")
+	fmt.Println("=== CLOUDINARY CONFIGURADO CORRECTAMENTE ===")
 }

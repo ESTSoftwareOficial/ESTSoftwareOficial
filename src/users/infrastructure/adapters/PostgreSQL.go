@@ -19,9 +19,9 @@ func (ps *PostgreSQL) Save(user *entities.User) (*entities.User, error) {
 	query := `
 		INSERT INTO users (
 			first_name, second_name, last_name, second_last_name, 
-			email, secondary_email, password, registration_date, 
+			email, secondary_email, password, profile_photo, registration_date, 
 			role_id, oauth_provider, oauth_id
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
 		RETURNING id
 	`
 
@@ -35,6 +35,7 @@ func (ps *PostgreSQL) Save(user *entities.User) (*entities.User, error) {
 		user.Email,
 		user.SecondaryEmail,
 		user.Password,
+		user.ProfilePhoto,
 		user.RegistrationDate,
 		user.RoleID,
 		user.OAuthProvider,
@@ -52,7 +53,7 @@ func (ps *PostgreSQL) Save(user *entities.User) (*entities.User, error) {
 func (ps *PostgreSQL) GetByEmail(email string) (*entities.User, error) {
 	query := `
 		SELECT id, first_name, second_name, last_name, second_last_name, 
-		       email, secondary_email, password, registration_date, 
+		       email, secondary_email, password, profile_photo, registration_date, 
 		       role_id, oauth_provider, oauth_id
 		FROM users 
 		WHERE email = $1
@@ -68,6 +69,7 @@ func (ps *PostgreSQL) GetByEmail(email string) (*entities.User, error) {
 		&user.Email,
 		&user.SecondaryEmail,
 		&user.Password,
+		&user.ProfilePhoto,
 		&user.RegistrationDate,
 		&user.RoleID,
 		&user.OAuthProvider,
@@ -87,7 +89,7 @@ func (ps *PostgreSQL) GetByEmail(email string) (*entities.User, error) {
 func (ps *PostgreSQL) GetByID(id int) (*entities.User, error) {
 	query := `
 		SELECT id, first_name, second_name, last_name, second_last_name, 
-		       email, secondary_email, password, registration_date, 
+		       email, secondary_email, password, profile_photo, registration_date, 
 		       role_id, oauth_provider, oauth_id
 		FROM users 
 		WHERE id = $1
@@ -103,6 +105,7 @@ func (ps *PostgreSQL) GetByID(id int) (*entities.User, error) {
 		&user.Email,
 		&user.SecondaryEmail,
 		&user.Password,
+		&user.ProfilePhoto,
 		&user.RegistrationDate,
 		&user.RoleID,
 		&user.OAuthProvider,
@@ -122,7 +125,7 @@ func (ps *PostgreSQL) GetByID(id int) (*entities.User, error) {
 func (ps *PostgreSQL) GetAll() ([]*entities.User, error) {
 	query := `
 		SELECT id, first_name, second_name, last_name, second_last_name, 
-		       email, secondary_email, password, registration_date, 
+		       email, secondary_email, password, profile_photo, registration_date, 
 		       role_id, oauth_provider, oauth_id
 		FROM users 
 		ORDER BY registration_date DESC
@@ -146,6 +149,7 @@ func (ps *PostgreSQL) GetAll() ([]*entities.User, error) {
 			&user.Email,
 			&user.SecondaryEmail,
 			&user.Password,
+			&user.ProfilePhoto,
 			&user.RegistrationDate,
 			&user.RoleID,
 			&user.OAuthProvider,
@@ -173,7 +177,8 @@ func (ps *PostgreSQL) Update(user *entities.User) error {
 			second_last_name = $5, 
 			email = $6, 
 			secondary_email = $7, 
-			role_id = $8
+			profile_photo = $8,
+			role_id = $9
 		WHERE id = $1
 	`
 
@@ -186,6 +191,7 @@ func (ps *PostgreSQL) Update(user *entities.User) error {
 		user.SecondLastName,
 		user.Email,
 		user.SecondaryEmail,
+		user.ProfilePhoto,
 		user.RoleID,
 	)
 

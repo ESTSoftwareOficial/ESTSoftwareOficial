@@ -23,5 +23,9 @@ func (uu *UpdateUser) Execute(user *entities.User) error {
 		return errors.New("usuario no encontrado")
 	}
 
+	if user.ProfilePhoto == nil || *user.ProfilePhoto == "" {
+		user.ProfilePhoto = existingUser.ProfilePhoto
+	}
+
 	return uu.userRepo.Update(user)
 }

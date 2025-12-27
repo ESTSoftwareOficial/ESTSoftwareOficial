@@ -1,6 +1,7 @@
 package cloudinary
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"strings"
@@ -9,9 +10,15 @@ import (
 )
 
 func UploadImage(fileBytes []byte, folder, fileName string) (string, error) {
+	if CloudinaryInstance == nil {
+		return "", fmt.Errorf("Cloudinary no está inicializado")
+	}
+
 	ctx := context.Background()
 
-	uploadResult, err := CloudinaryInstance.Upload.Upload(ctx, fileBytes, uploader.UploadParams{
+	fileReader := bytes.NewReader(fileBytes)
+
+	uploadResult, err := CloudinaryInstance.Upload.Upload(ctx, fileReader, uploader.UploadParams{
 		Folder:       folder,
 		ResourceType: "image",
 	})
@@ -32,6 +39,10 @@ func UploadCourseImage(fileBytes []byte, fileName string) (string, error) {
 }
 
 func DeleteImage(imageURL string) error {
+	if CloudinaryInstance == nil {
+		return fmt.Errorf("Cloudinary no está inicializado")
+	}
+
 	ctx := context.Background()
 
 	publicID := ExtractPublicID(imageURL)

@@ -1,0 +1,59 @@
+package controllers
+
+import (
+	"net/http"
+	"strconv"
+
+	"estsoftwareoficial/src/courses/application"
+	"estsoftwareoficial/src/courses/domain/dto"
+
+	"github.com/gin-gonic/gin"
+)
+
+type GetCoursesByCategoryController struct {
+	getCoursesByCategory *application.GetCoursesByCategory
+}
+
+func NewGetCoursesByCategoryController(getCoursesByCategory *application.GetCoursesByCategory) *GetCoursesByCategoryController {
+	return &GetCoursesByCategoryController{getCoursesByCategory: getCoursesByCategory}
+}
+
+func (gc *GetCoursesByCategoryController) Execute(c *gin.Context) {
+	categoryIDStr := c.Param("categoryId")
+	categoryID, err := strconv.Atoi(categoryIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de categoría inválido"})
+		return
+	}
+
+	courses, err := gc.getCoursesByCategory.Execute(categoryID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var courseResponses []dto.CourseResponse
+	for _, course := range courses {
+		courseResponses = append(courseResponses, dto.CourseResponse{
+			ID:            course.ID,
+			NameCourse:    course.NameCourse,
+			Description:   course.Description,
+			TechnologyID:  course.TechnologyID,
+			InstructorID:  course.InstructorID,
+			CategoryID:    course.CategoryID,
+			Level:         course.Level,
+			ImageURL:      course.ImageURL,
+			TotalModules:  course.TotalModules,
+			AverageRating: course.AverageRating,
+			TotalRatings:  course.TotalRatings,
+			DurationHours: course.DurationHours,
+			CreatedAt:     course.CreatedAt,
+			UpdatedAt:     course.UpdatedAt,
+			IsActive:      course.IsActive,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"courses": courseResponses,
+	})
+}

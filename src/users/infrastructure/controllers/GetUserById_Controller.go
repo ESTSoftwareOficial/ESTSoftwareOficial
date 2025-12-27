@@ -45,6 +45,7 @@ func (gc *GetUserByIdController) Execute(c *gin.Context) {
 			SecondLastName:   user.SecondLastName,
 			Email:            user.Email,
 			SecondaryEmail:   user.SecondaryEmail,
+			ProfilePhoto:     user.ProfilePhoto,
 			RegistrationDate: user.RegistrationDate,
 			RoleID:           user.RoleID,
 			OAuthProvider:    user.OAuthProvider,

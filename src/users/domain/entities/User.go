@@ -11,6 +11,7 @@ type User struct {
 	Email            string    `json:"email"`
 	SecondaryEmail   *string   `json:"secondaryEmail,omitempty"`
 	Password         *string   `json:"password,omitempty"`
+	ProfilePhoto     *string   `json:"profilePhoto,omitempty"`
 	RegistrationDate time.Time `json:"registrationDate"`
 	RoleID           int       `json:"roleId"`
 	OAuthProvider    *string   `json:"oauthProvider,omitempty"`

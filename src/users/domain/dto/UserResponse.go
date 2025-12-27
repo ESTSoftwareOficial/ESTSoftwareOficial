@@ -10,6 +10,7 @@ type UserResponse struct {
 	SecondLastName   string    `json:"secondLastName"`
 	Email            string    `json:"email"`
 	SecondaryEmail   *string   `json:"secondaryEmail,omitempty"`
+	ProfilePhoto     *string   `json:"profilePhoto,omitempty"`
 	RegistrationDate time.Time `json:"registrationDate"`
 	RoleID           int       `json:"roleId"`
 	OAuthProvider    *string   `json:"oauthProvider,omitempty"`

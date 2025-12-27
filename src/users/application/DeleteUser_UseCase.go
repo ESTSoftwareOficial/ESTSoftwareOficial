@@ -2,6 +2,7 @@ package application
 
 import (
 	"errors"
+	"estsoftwareoficial/src/core/cloudinary"
 	"estsoftwareoficial/src/users/domain"
 )
 
@@ -20,6 +21,12 @@ func (du *DeleteUser) Execute(id int) error {
 	}
 	if existingUser == nil {
 		return errors.New("usuario no encontrado")
+	}
+
+	if existingUser.ProfilePhoto != nil && *existingUser.ProfilePhoto != "" {
+		if err := cloudinary.DeleteImage(*existingUser.ProfilePhoto); err != nil {
+			return errors.New("error al eliminar foto de perfil de Cloudinary")
+		}
 	}
 
 	return du.userRepo.Delete(id)
