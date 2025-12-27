@@ -417,7 +417,6 @@ func (ps *PostgreSQL) Search(keyword string, categoryID *int, technologyID *int,
 	if minRating != nil {
 		query += fmt.Sprintf(" AND average_rating >= $%d", argPosition)
 		args = append(args, *minRating)
-		argPosition++
 	}
 
 	query += " ORDER BY average_rating DESC, created_at DESC"
