@@ -20,10 +20,10 @@ func NewPostgreSQL(conn *sql.DB) *PostgreSQL {
 func (ps *PostgreSQL) Save(lesson *entities.Lesson) (*entities.Lesson, error) {
 	query := `
 		INSERT INTO lessons (
-			module_id, title, content_type, content_url, body_text, 
-			duration_minutes, order_index, is_preview, created_at
+			module_id, title, content_type, bunny_library_id, bunny_video_id,
+			body_text, duration_minutes, order_index, is_preview, created_at
 		) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
 		RETURNING id, created_at
 	`
 
@@ -33,7 +33,8 @@ func (ps *PostgreSQL) Save(lesson *entities.Lesson) (*entities.Lesson, error) {
 		lesson.ModuleID,
 		lesson.Title,
 		lesson.ContentType,
-		lesson.ContentURL,
+		lesson.BunnyLibraryID,
+		lesson.BunnyVideoID,
 		lesson.BodyText,
 		lesson.DurationMinutes,
 		lesson.OrderIndex,
@@ -50,8 +51,8 @@ func (ps *PostgreSQL) Save(lesson *entities.Lesson) (*entities.Lesson, error) {
 
 func (ps *PostgreSQL) GetByID(id int) (*entities.Lesson, error) {
 	query := `
-		SELECT id, module_id, title, content_type, content_url, body_text, 
-		       duration_minutes, order_index, is_preview, created_at
+		SELECT id, module_id, title, content_type, bunny_library_id, bunny_video_id,
+		       body_text, duration_minutes, order_index, is_preview, created_at
 		FROM lessons 
 		WHERE id = $1
 	`
@@ -62,7 +63,8 @@ func (ps *PostgreSQL) GetByID(id int) (*entities.Lesson, error) {
 		&lesson.ModuleID,
 		&lesson.Title,
 		&lesson.ContentType,
-		&lesson.ContentURL,
+		&lesson.BunnyLibraryID,
+		&lesson.BunnyVideoID,
 		&lesson.BodyText,
 		&lesson.DurationMinutes,
 		&lesson.OrderIndex,
@@ -82,8 +84,8 @@ func (ps *PostgreSQL) GetByID(id int) (*entities.Lesson, error) {
 
 func (ps *PostgreSQL) GetAll() ([]*entities.Lesson, error) {
 	query := `
-		SELECT id, module_id, title, content_type, content_url, body_text, 
-		       duration_minutes, order_index, is_preview, created_at
+		SELECT id, module_id, title, content_type, bunny_library_id, bunny_video_id,
+		       body_text, duration_minutes, order_index, is_preview, created_at
 		FROM lessons 
 		ORDER BY module_id, order_index ASC
 	`
@@ -102,7 +104,8 @@ func (ps *PostgreSQL) GetAll() ([]*entities.Lesson, error) {
 			&lesson.ModuleID,
 			&lesson.Title,
 			&lesson.ContentType,
-			&lesson.ContentURL,
+			&lesson.BunnyLibraryID,
+			&lesson.BunnyVideoID,
 			&lesson.BodyText,
 			&lesson.DurationMinutes,
 			&lesson.OrderIndex,
@@ -120,8 +123,8 @@ func (ps *PostgreSQL) GetAll() ([]*entities.Lesson, error) {
 
 func (ps *PostgreSQL) GetByModule(moduleID int) ([]*entities.Lesson, error) {
 	query := `
-		SELECT id, module_id, title, content_type, content_url, body_text, 
-		       duration_minutes, order_index, is_preview, created_at
+		SELECT id, module_id, title, content_type, bunny_library_id, bunny_video_id,
+		       body_text, duration_minutes, order_index, is_preview, created_at
 		FROM lessons 
 		WHERE module_id = $1
 		ORDER BY order_index ASC
@@ -141,7 +144,8 @@ func (ps *PostgreSQL) GetByModule(moduleID int) ([]*entities.Lesson, error) {
 			&lesson.ModuleID,
 			&lesson.Title,
 			&lesson.ContentType,
-			&lesson.ContentURL,
+			&lesson.BunnyLibraryID,
+			&lesson.BunnyVideoID,
 			&lesson.BodyText,
 			&lesson.DurationMinutes,
 			&lesson.OrderIndex,
@@ -162,11 +166,12 @@ func (ps *PostgreSQL) Update(lesson *entities.Lesson) error {
 		UPDATE lessons SET 
 			title = $2, 
 			content_type = $3, 
-			content_url = $4, 
-			body_text = $5, 
-			duration_minutes = $6, 
-			order_index = $7, 
-			is_preview = $8
+			bunny_library_id = $4,
+			bunny_video_id = $5,
+			body_text = $6, 
+			duration_minutes = $7, 
+			order_index = $8, 
+			is_preview = $9
 		WHERE id = $1
 	`
 
@@ -175,7 +180,8 @@ func (ps *PostgreSQL) Update(lesson *entities.Lesson) error {
 		lesson.ID,
 		lesson.Title,
 		lesson.ContentType,
-		lesson.ContentURL,
+		lesson.BunnyLibraryID,
+		lesson.BunnyVideoID,
 		lesson.BodyText,
 		lesson.DurationMinutes,
 		lesson.OrderIndex,

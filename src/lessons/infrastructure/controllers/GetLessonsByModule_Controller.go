@@ -39,7 +39,7 @@ func (gl *GetLessonsByModuleController) Execute(c *gin.Context) {
 			ModuleID:        lesson.ModuleID,
 			Title:           lesson.Title,
 			ContentType:     lesson.ContentType,
-			ContentURL:      lesson.ContentURL,
+			VideoURL:        lesson.GetVideoURL(),
 			BodyText:        lesson.BodyText,
 			DurationMinutes: lesson.DurationMinutes,
 			OrderIndex:      lesson.OrderIndex,

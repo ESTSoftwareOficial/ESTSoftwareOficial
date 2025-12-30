@@ -34,8 +34,8 @@ func InitLessons() *DependenciesLessons {
 		GetAllLessonsController:      controllers.NewGetAllLessonsController(getAllLessons),
 		GetLessonByIdController:      controllers.NewGetLessonByIdController(getLessonById),
 		GetLessonsByModuleController: controllers.NewGetLessonsByModuleController(getLessonsByModule),
-		UpdateLessonController:       controllers.NewUpdateLessonController(updateLesson),
-		DeleteLessonController:       controllers.NewDeleteLessonController(deleteLesson),
+		UpdateLessonController:       controllers.NewUpdateLessonController(updateLesson, getLessonById),
+		DeleteLessonController:       controllers.NewDeleteLessonController(deleteLesson, getLessonById),
 		ReorderLessonsController:     controllers.NewReorderLessonsController(reorderLessons),
 	}
 }
