@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"estsoftwareoficial/src/course_ratings/domain/entities"
+	"estsoftwareoficial/src/course_ratings/domain/dto" 
 )
 
 type PostgreSQL struct {
@@ -42,22 +43,31 @@ func (ps *PostgreSQL) Save(courseRating *entities.CourseRating) (*entities.Cours
 	return courseRating, nil
 }
 
-func (ps *PostgreSQL) GetByID(id int) (*entities.CourseRating, error) {
+func (ps *PostgreSQL) GetByID(id int) (*dto.CourseRatingResponse, error) {
 	query := `
-		SELECT id, course_id, user_id, rating, review, created_at, updated_at 
-		FROM course_ratings 
-		WHERE id = $1
+		SELECT 
+			cr.id,
+			c.name_course,
+			CONCAT(u.first_name, ' ', u.last_name) AS user_name,
+			cr.rating,
+			cr.review,
+			cr.created_at,
+			cr.updated_at
+		FROM course_ratings cr
+		INNER JOIN courses c ON cr.course_id = c.id
+		INNER JOIN users u ON cr.user_id = u.id
+		WHERE cr.id = $1
 	`
 
-	var courseRating entities.CourseRating
+	var response dto.CourseRatingResponse
 	err := ps.conn.QueryRow(query, id).Scan(
-		&courseRating.ID,
-		&courseRating.CourseID,
-		&courseRating.UserID,
-		&courseRating.Rating,
-		&courseRating.Review,
-		&courseRating.CreatedAt,
-		&courseRating.UpdatedAt,
+		&response.ID,
+		&response.CourseName,
+		&response.UserName,
+		&response.Rating,
+		&response.Review,
+		&response.CreatedAt,
+		&response.UpdatedAt,
 	)
 
 	if err != nil {
@@ -67,14 +77,23 @@ func (ps *PostgreSQL) GetByID(id int) (*entities.CourseRating, error) {
 		return nil, fmt.Errorf("error al buscar calificación por ID: %v", err)
 	}
 
-	return &courseRating, nil
+	return &response, nil
 }
 
-func (ps *PostgreSQL) GetAll() ([]*entities.CourseRating, error) {
+func (ps *PostgreSQL) GetAll() ([]*dto.CourseRatingResponse, error) {
 	query := `
-		SELECT id, course_id, user_id, rating, review, created_at, updated_at 
-		FROM course_ratings 
-		ORDER BY created_at DESC
+		SELECT 
+			cr.id,
+			c.name_course,
+			CONCAT(u.first_name, ' ', u.last_name) AS user_name,
+			cr.rating,
+			cr.review,
+			cr.created_at,
+			cr.updated_at
+		FROM course_ratings cr
+		INNER JOIN courses c ON cr.course_id = c.id
+		INNER JOIN users u ON cr.user_id = u.id
+		ORDER BY cr.created_at DESC
 	`
 
 	rows, err := ps.conn.Query(query)
@@ -83,33 +102,42 @@ func (ps *PostgreSQL) GetAll() ([]*entities.CourseRating, error) {
 	}
 	defer rows.Close()
 
-	var courseRatings []*entities.CourseRating
+	var responses []*dto.CourseRatingResponse
 	for rows.Next() {
-		var courseRating entities.CourseRating
+		var response dto.CourseRatingResponse
 		err := rows.Scan(
-			&courseRating.ID,
-			&courseRating.CourseID,
-			&courseRating.UserID,
-			&courseRating.Rating,
-			&courseRating.Review,
-			&courseRating.CreatedAt,
-			&courseRating.UpdatedAt,
+			&response.ID,
+			&response.CourseName,
+			&response.UserName,
+			&response.Rating,
+			&response.Review,
+			&response.CreatedAt,
+			&response.UpdatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error al escanear calificación: %v", err)
 		}
-		courseRatings = append(courseRatings, &courseRating)
+		responses = append(responses, &response)
 	}
 
-	return courseRatings, nil
+	return responses, nil
 }
 
-func (ps *PostgreSQL) GetByCourse(courseID int) ([]*entities.CourseRating, error) {
+func (ps *PostgreSQL) GetByCourse(courseID int) ([]*dto.CourseRatingResponse, error) {
 	query := `
-		SELECT id, course_id, user_id, rating, review, created_at, updated_at 
-		FROM course_ratings 
-		WHERE course_id = $1
-		ORDER BY created_at DESC
+		SELECT 
+			cr.id,
+			c.name_course,
+			CONCAT(u.first_name, ' ', u.last_name) AS user_name,
+			cr.rating,
+			cr.review,
+			cr.created_at,
+			cr.updated_at
+		FROM course_ratings cr
+		INNER JOIN courses c ON cr.course_id = c.id
+		INNER JOIN users u ON cr.user_id = u.id
+		WHERE cr.course_id = $1
+		ORDER BY cr.created_at DESC
 	`
 
 	rows, err := ps.conn.Query(query, courseID)
@@ -118,25 +146,25 @@ func (ps *PostgreSQL) GetByCourse(courseID int) ([]*entities.CourseRating, error
 	}
 	defer rows.Close()
 
-	var courseRatings []*entities.CourseRating
+	var responses []*dto.CourseRatingResponse
 	for rows.Next() {
-		var courseRating entities.CourseRating
+		var response dto.CourseRatingResponse
 		err := rows.Scan(
-			&courseRating.ID,
-			&courseRating.CourseID,
-			&courseRating.UserID,
-			&courseRating.Rating,
-			&courseRating.Review,
-			&courseRating.CreatedAt,
-			&courseRating.UpdatedAt,
+			&response.ID,
+			&response.CourseName,
+			&response.UserName,
+			&response.Rating,
+			&response.Review,
+			&response.CreatedAt,
+			&response.UpdatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error al escanear calificación: %v", err)
 		}
-		courseRatings = append(courseRatings, &courseRating)
+		responses = append(responses, &response)
 	}
 
-	return courseRatings, nil
+	return responses, nil
 }
 
 func (ps *PostgreSQL) GetByUserAndCourse(userID int, courseID int) (*entities.CourseRating, error) {
