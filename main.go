@@ -3,6 +3,7 @@ package main
 import (
 	categoryInfrastructure "estsoftwareoficial/src/categories/infrastructure"
 	categoryRoutes "estsoftwareoficial/src/categories/infrastructure/routes"
+	"estsoftwareoficial/src/core/bunny"
 	"estsoftwareoficial/src/core/cloudinary"
 	courseRatingInfrastructure "estsoftwareoficial/src/course_ratings/infrastructure"
 	courseRatingRoutes "estsoftwareoficial/src/course_ratings/infrastructure/routes"
@@ -28,6 +29,8 @@ import (
 
 func main() {
 	cloudinary.InitCloudinary()
+	bunny.InitBunny()
+
 	userDeps := userInfrastructure.InitUsers()
 	categoryDeps := categoryInfrastructure.InitCategories()
 	technologyDeps := technologyInfrastructure.InitTechnologies()

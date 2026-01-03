@@ -14,4 +14,12 @@ type CourseRepository interface {
 	UpdateTotalModules(courseID int, totalModules int) error
 	UpdateRating(courseID int, averageRating float64, totalRatings int) error
 	Search(keyword string, categoryID *int, technologyID *int, level *string, minRating *float64) ([]*entities.Course, error)
+	
+	// Nuevos métodos con JOINs
+	GetByIDWithRelations(id int) (*entities.CourseWithRelations, error)
+	GetAllWithRelations() ([]*entities.CourseWithRelations, error)
+	GetByInstructorWithRelations(instructorID int) ([]*entities.CourseWithRelations, error)
+	GetByCategoryWithRelations(categoryID int) ([]*entities.CourseWithRelations, error)
+	GetByTechnologyWithRelations(technologyID int) ([]*entities.CourseWithRelations, error)
+	SearchWithRelations(keyword string, categoryID *int, technologyID *int, level *string, minRating *float64) ([]*entities.CourseWithRelations, error)
 }

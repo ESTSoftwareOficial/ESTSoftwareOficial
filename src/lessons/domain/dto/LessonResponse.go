@@ -7,7 +7,7 @@ type LessonResponse struct {
 	ModuleID        int       `json:"moduleId"`
 	Title           string    `json:"title"`
 	ContentType     string    `json:"contentType"`
-	ContentURL      *string   `json:"contentUrl,omitempty"`
+	VideoURL        *string   `json:"videoUrl,omitempty"`
 	BodyText        *string   `json:"bodyText,omitempty"`
 	DurationMinutes int       `json:"durationMinutes"`
 	OrderIndex      int       `json:"orderIndex"`
