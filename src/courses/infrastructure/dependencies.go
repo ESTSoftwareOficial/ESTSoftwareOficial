@@ -23,7 +23,8 @@ func InitCourses() *DependenciesCourses {
 	conn := core.GetDBPool()
 	courseRepo := adapters.NewPostgreSQL(conn.DB)
 
-	createCourse := application.NewCreateCourse(courseRepo)
+	//createCourse := application.NewCreateCourse(courseRepo)
+	createCourseWithRelations := application.NewCreateCourseWithRelations(courseRepo)
 	getAllCourses := application.NewGetAllCourses(courseRepo)
 	getCourseById := application.NewGetCourseById(courseRepo)
 	getCoursesByInstructor := application.NewGetCoursesByInstructor(courseRepo)
@@ -34,7 +35,7 @@ func InitCourses() *DependenciesCourses {
 	searchCourses := application.NewSearchCourses(courseRepo)
 
 	return &DependenciesCourses{
-		CreateCourseController:           controllers.NewCreateCourseController(createCourse),
+		CreateCourseController:           controllers.NewCreateCourseController(createCourseWithRelations),
 		GetAllCoursesController:          controllers.NewGetAllCoursesController(getAllCourses),
 		GetCourseByIdController:          controllers.NewGetCourseByIdController(getCourseById),
 		GetCoursesByInstructorController: controllers.NewGetCoursesByInstructorController(getCoursesByInstructor),

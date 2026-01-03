@@ -13,6 +13,6 @@ func NewGetCoursesByTechnology(courseRepo domain.CourseRepository) *GetCoursesBy
 	return &GetCoursesByTechnology{courseRepo: courseRepo}
 }
 
-func (gc *GetCoursesByTechnology) Execute(technologyID int) ([]*entities.Course, error) {
-	return gc.courseRepo.GetByTechnology(technologyID)
+func (gc *GetCoursesByTechnology) Execute(technologyID int) ([]*entities.CourseWithRelations, error) {
+	return gc.courseRepo.GetByTechnologyWithRelations(technologyID)
 }

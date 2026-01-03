@@ -13,6 +13,7 @@ func NewGetAllCourses(courseRepo domain.CourseRepository) *GetAllCourses {
 	return &GetAllCourses{courseRepo: courseRepo}
 }
 
-func (gc *GetAllCourses) Execute() ([]*entities.Course, error) {
-	return gc.courseRepo.GetAll()
+// Retorna cursos con relaciones
+func (gc *GetAllCourses) Execute() ([]*entities.CourseWithRelations, error) {
+	return gc.courseRepo.GetAllWithRelations()
 }
