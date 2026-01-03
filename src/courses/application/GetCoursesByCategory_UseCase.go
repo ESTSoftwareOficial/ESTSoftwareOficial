@@ -13,6 +13,6 @@ func NewGetCoursesByCategory(courseRepo domain.CourseRepository) *GetCoursesByCa
 	return &GetCoursesByCategory{courseRepo: courseRepo}
 }
 
-func (gc *GetCoursesByCategory) Execute(categoryID int) ([]*entities.Course, error) {
-	return gc.courseRepo.GetByCategory(categoryID)
+func (gc *GetCoursesByCategory) Execute(categoryID int) ([]*entities.CourseWithRelations, error) {
+	return gc.courseRepo.GetByCategoryWithRelations(categoryID)
 }

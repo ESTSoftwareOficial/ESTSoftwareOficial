@@ -39,12 +39,18 @@ func (gc *GetCourseByIdController) Execute(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"course": dto.CourseResponse{
-			ID:            course.ID,
-			NameCourse:    course.NameCourse,
-			Description:   course.Description,
-			TechnologyID:  course.TechnologyID,
-			InstructorID:  course.InstructorID,
-			CategoryID:    course.CategoryID,
+			ID:          course.ID,
+			NameCourse:  course.NameCourse,
+			Description: course.Description,
+			Technology: dto.TechnologyDTO{
+				TechnologyName:  course.TechnologyName,
+				TechnologyImage: course.TechnologyImage,
+			},
+			Instructor: dto.InstructorDTO{
+				InstructorName:  course.InstructorName,
+				InstructorImage: course.InstructorImage,
+			},
+			CategoryName:  course.CategoryName,
 			Level:         course.Level,
 			ImageURL:      course.ImageURL,
 			TotalModules:  course.TotalModules,

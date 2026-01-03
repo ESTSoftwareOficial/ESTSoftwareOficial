@@ -14,16 +14,14 @@ import (
 )
 
 type CreateCourseController struct {
-	createCourse *application.CreateCourse
+	createCourseWithRelations *application.CreateCourseWithRelations
 }
 
-func NewCreateCourseController(createCourse *application.CreateCourse) *CreateCourseController {
-	return &CreateCourseController{createCourse: createCourse}
+func NewCreateCourseController(createCourseWithRelations *application.CreateCourseWithRelations) *CreateCourseController {
+	return &CreateCourseController{createCourseWithRelations: createCourseWithRelations}
 }
 
 func (cc *CreateCourseController) Execute(c *gin.Context) {
-	fmt.Println("=== INICIO CREATE COURSE ===")
-
 	nameCourse := c.PostForm("nameCourse")
 	description := c.PostForm("description")
 	technologyID := c.PostForm("technologyId")
@@ -95,6 +93,7 @@ func (cc *CreateCourseController) Execute(c *gin.Context) {
 		fmt.Printf("No se recibió imagen: %v\n", err)
 	}
 
+	// Crea la entidad Course con IDs
 	course := &entities.Course{
 		NameCourse:    nameCourse,
 		Description:   description,
@@ -106,33 +105,41 @@ func (cc *CreateCourseController) Execute(c *gin.Context) {
 		DurationHours: durationHoursFloat,
 	}
 
+	// Guarda y obtiene el curso con relaciones
 	fmt.Println("Guardando curso en BD...")
-	savedCourse, err := cc.createCourse.Execute(course)
+	courseWithRelations, err := cc.createCourseWithRelations.Execute(course)
 	if err != nil {
 		fmt.Printf("ERROR al guardar curso: %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	// RESPUESTA con objetos relacionados (NUEVO)
 	fmt.Println("Curso creado exitosamente")
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Curso creado exitosamente",
 		"course": dto.CourseResponse{
-			ID:            savedCourse.ID,
-			NameCourse:    savedCourse.NameCourse,
-			Description:   savedCourse.Description,
-			TechnologyID:  savedCourse.TechnologyID,
-			InstructorID:  savedCourse.InstructorID,
-			CategoryID:    savedCourse.CategoryID,
-			Level:         savedCourse.Level,
-			ImageURL:      savedCourse.ImageURL,
-			TotalModules:  savedCourse.TotalModules,
-			AverageRating: savedCourse.AverageRating,
-			TotalRatings:  savedCourse.TotalRatings,
-			DurationHours: savedCourse.DurationHours,
-			CreatedAt:     savedCourse.CreatedAt,
-			UpdatedAt:     savedCourse.UpdatedAt,
-			IsActive:      savedCourse.IsActive,
+			ID:          courseWithRelations.ID,
+			NameCourse:  courseWithRelations.NameCourse,
+			Description: courseWithRelations.Description,
+			Technology: dto.TechnologyDTO{
+				TechnologyName:  courseWithRelations.TechnologyName,
+				TechnologyImage: courseWithRelations.TechnologyImage,
+			},
+			Instructor: dto.InstructorDTO{
+				InstructorName:  courseWithRelations.InstructorName,
+				InstructorImage: courseWithRelations.InstructorImage,
+			},
+			CategoryName:  courseWithRelations.CategoryName,
+			Level:         courseWithRelations.Level,
+			ImageURL:      courseWithRelations.ImageURL,
+			TotalModules:  courseWithRelations.TotalModules,
+			AverageRating: courseWithRelations.AverageRating,
+			TotalRatings:  courseWithRelations.TotalRatings,
+			DurationHours: courseWithRelations.DurationHours,
+			CreatedAt:     courseWithRelations.CreatedAt,
+			UpdatedAt:     courseWithRelations.UpdatedAt,
+			IsActive:      courseWithRelations.IsActive,
 		},
 	})
 }

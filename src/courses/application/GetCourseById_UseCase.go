@@ -13,6 +13,6 @@ func NewGetCourseById(courseRepo domain.CourseRepository) *GetCourseById {
 	return &GetCourseById{courseRepo: courseRepo}
 }
 
-func (gc *GetCourseById) Execute(id int) (*entities.Course, error) {
-	return gc.courseRepo.GetByID(id)
+func (gc *GetCourseById) Execute(id int) (*entities.CourseWithRelations, error) {
+	return gc.courseRepo.GetByIDWithRelations(id)
 }

@@ -455,3 +455,425 @@ func (ps *PostgreSQL) Search(keyword string, categoryID *int, technologyID *int,
 
 	return courses, nil
 }
+
+// GetByIDWithRelations obtiene un curso por ID con datos relacionados
+func (ps *PostgreSQL) GetByIDWithRelations(id int) (*entities.CourseWithRelations, error) {
+	query := `
+		SELECT 
+			c.id, 
+			c.name_course, 
+			c.description, 
+			c.level, 
+			c.image_url, 
+			c.total_modules, 
+			c.average_rating, 
+			c.total_ratings, 
+			c.duration_hours, 
+			c.created_at, 
+			c.updated_at, 
+			c.is_active,
+			t.name AS technology_name,
+			t.icon AS technology_image,
+			CONCAT(u.first_name, ' ', u.last_name) AS instructor_name,
+			u.profile_photo AS instructor_image,
+			cat.name AS category_name
+		FROM courses c
+		INNER JOIN technologies t ON c.technology_id = t.id
+		INNER JOIN users u ON c.instructor_id = u.id
+		INNER JOIN categories cat ON c.category_id = cat.id
+		WHERE c.id = $1
+	`
+
+	var course entities.CourseWithRelations
+	err := ps.conn.QueryRow(query, id).Scan(
+		&course.ID,
+		&course.NameCourse,
+		&course.Description,
+		&course.Level,
+		&course.ImageURL,
+		&course.TotalModules,
+		&course.AverageRating,
+		&course.TotalRatings,
+		&course.DurationHours,
+		&course.CreatedAt,
+		&course.UpdatedAt,
+		&course.IsActive,
+		&course.TechnologyName,
+		&course.TechnologyImage,
+		&course.InstructorName,
+		&course.InstructorImage,
+		&course.CategoryName,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("error al buscar curso por ID: %v", err)
+	}
+
+	return &course, nil
+}
+
+// GetAllWithRelations obtiene todos los cursos con datos relacionados
+func (ps *PostgreSQL) GetAllWithRelations() ([]*entities.CourseWithRelations, error) {
+	query := `
+		SELECT 
+			c.id, 
+			c.name_course, 
+			c.description, 
+			c.level, 
+			c.image_url, 
+			c.total_modules, 
+			c.average_rating, 
+			c.total_ratings, 
+			c.duration_hours, 
+			c.created_at, 
+			c.updated_at, 
+			c.is_active,
+			t.name AS technology_name,
+			t.icon AS technology_image,
+			CONCAT(u.first_name, ' ', u.last_name) AS instructor_name,
+			u.profile_photo AS instructor_image,
+			cat.name AS category_name
+		FROM courses c
+		INNER JOIN technologies t ON c.technology_id = t.id
+		INNER JOIN users u ON c.instructor_id = u.id
+		INNER JOIN categories cat ON c.category_id = cat.id
+		WHERE c.is_active = true
+		ORDER BY c.created_at DESC
+	`
+
+	rows, err := ps.conn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error al obtener todos los cursos: %v", err)
+	}
+	defer rows.Close()
+
+	var courses []*entities.CourseWithRelations
+	for rows.Next() {
+		var course entities.CourseWithRelations
+		err := rows.Scan(
+			&course.ID,
+			&course.NameCourse,
+			&course.Description,
+			&course.Level,
+			&course.ImageURL,
+			&course.TotalModules,
+			&course.AverageRating,
+			&course.TotalRatings,
+			&course.DurationHours,
+			&course.CreatedAt,
+			&course.UpdatedAt,
+			&course.IsActive,
+			&course.TechnologyName,
+			&course.TechnologyImage,
+			&course.InstructorName,
+			&course.InstructorImage,
+			&course.CategoryName,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error al escanear curso: %v", err)
+		}
+		courses = append(courses, &course)
+	}
+
+	return courses, nil
+}
+
+// GetByInstructorWithRelations obtiene cursos por instructor con datos relacionados
+func (ps *PostgreSQL) GetByInstructorWithRelations(instructorID int) ([]*entities.CourseWithRelations, error) {
+	query := `
+		SELECT 
+			c.id, 
+			c.name_course, 
+			c.description, 
+			c.level, 
+			c.image_url, 
+			c.total_modules, 
+			c.average_rating, 
+			c.total_ratings, 
+			c.duration_hours, 
+			c.created_at, 
+			c.updated_at, 
+			c.is_active,
+			t.name AS technology_name,
+			t.icon AS technology_image,
+			CONCAT(u.first_name, ' ', u.last_name) AS instructor_name,
+			u.profile_photo AS instructor_image,
+			cat.name AS category_name
+		FROM courses c
+		INNER JOIN technologies t ON c.technology_id = t.id
+		INNER JOIN users u ON c.instructor_id = u.id
+		INNER JOIN categories cat ON c.category_id = cat.id
+		WHERE c.instructor_id = $1
+		ORDER BY c.created_at DESC
+	`
+
+	rows, err := ps.conn.Query(query, instructorID)
+	if err != nil {
+		return nil, fmt.Errorf("error al obtener cursos por instructor: %v", err)
+	}
+	defer rows.Close()
+
+	var courses []*entities.CourseWithRelations
+	for rows.Next() {
+		var course entities.CourseWithRelations
+		err := rows.Scan(
+			&course.ID,
+			&course.NameCourse,
+			&course.Description,
+			&course.Level,
+			&course.ImageURL,
+			&course.TotalModules,
+			&course.AverageRating,
+			&course.TotalRatings,
+			&course.DurationHours,
+			&course.CreatedAt,
+			&course.UpdatedAt,
+			&course.IsActive,
+			&course.TechnologyName,
+			&course.TechnologyImage,
+			&course.InstructorName,
+			&course.InstructorImage,
+			&course.CategoryName,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error al escanear curso: %v", err)
+		}
+		courses = append(courses, &course)
+	}
+
+	return courses, nil
+}
+
+// GetByCategoryWithRelations obtiene cursos por categoría con datos relacionados
+func (ps *PostgreSQL) GetByCategoryWithRelations(categoryID int) ([]*entities.CourseWithRelations, error) {
+	query := `
+		SELECT 
+			c.id, 
+			c.name_course, 
+			c.description, 
+			c.level, 
+			c.image_url, 
+			c.total_modules, 
+			c.average_rating, 
+			c.total_ratings, 
+			c.duration_hours, 
+			c.created_at, 
+			c.updated_at, 
+			c.is_active,
+			t.name AS technology_name,
+			t.icon AS technology_image,
+			CONCAT(u.first_name, ' ', u.last_name) AS instructor_name,
+			u.profile_photo AS instructor_image,
+			cat.name AS category_name
+		FROM courses c
+		INNER JOIN technologies t ON c.technology_id = t.id
+		INNER JOIN users u ON c.instructor_id = u.id
+		INNER JOIN categories cat ON c.category_id = cat.id
+		WHERE c.category_id = $1 AND c.is_active = true
+		ORDER BY c.average_rating DESC, c.created_at DESC
+	`
+
+	rows, err := ps.conn.Query(query, categoryID)
+	if err != nil {
+		return nil, fmt.Errorf("error al obtener cursos por categoría: %v", err)
+	}
+	defer rows.Close()
+
+	var courses []*entities.CourseWithRelations
+	for rows.Next() {
+		var course entities.CourseWithRelations
+		err := rows.Scan(
+			&course.ID,
+			&course.NameCourse,
+			&course.Description,
+			&course.Level,
+			&course.ImageURL,
+			&course.TotalModules,
+			&course.AverageRating,
+			&course.TotalRatings,
+			&course.DurationHours,
+			&course.CreatedAt,
+			&course.UpdatedAt,
+			&course.IsActive,
+			&course.TechnologyName,
+			&course.TechnologyImage,
+			&course.InstructorName,
+			&course.InstructorImage,
+			&course.CategoryName,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error al escanear curso: %v", err)
+		}
+		courses = append(courses, &course)
+	}
+
+	return courses, nil
+}
+
+// GetByTechnologyWithRelations obtiene cursos por tecnología con datos relacionados
+func (ps *PostgreSQL) GetByTechnologyWithRelations(technologyID int) ([]*entities.CourseWithRelations, error) {
+	query := `
+		SELECT 
+			c.id, 
+			c.name_course, 
+			c.description, 
+			c.level, 
+			c.image_url, 
+			c.total_modules, 
+			c.average_rating, 
+			c.total_ratings, 
+			c.duration_hours, 
+			c.created_at, 
+			c.updated_at, 
+			c.is_active,
+			t.name AS technology_name,
+			t.icon AS technology_image,
+			CONCAT(u.first_name, ' ', u.last_name) AS instructor_name,
+			u.profile_photo AS instructor_image,
+			cat.name AS category_name
+		FROM courses c
+		INNER JOIN technologies t ON c.technology_id = t.id
+		INNER JOIN users u ON c.instructor_id = u.id
+		INNER JOIN categories cat ON c.category_id = cat.id
+		WHERE c.technology_id = $1 AND c.is_active = true
+		ORDER BY c.average_rating DESC, c.created_at DESC
+	`
+
+	rows, err := ps.conn.Query(query, technologyID)
+	if err != nil {
+		return nil, fmt.Errorf("error al obtener cursos por tecnología: %v", err)
+	}
+	defer rows.Close()
+
+	var courses []*entities.CourseWithRelations
+	for rows.Next() {
+		var course entities.CourseWithRelations
+		err := rows.Scan(
+			&course.ID,
+			&course.NameCourse,
+			&course.Description,
+			&course.Level,
+			&course.ImageURL,
+			&course.TotalModules,
+			&course.AverageRating,
+			&course.TotalRatings,
+			&course.DurationHours,
+			&course.CreatedAt,
+			&course.UpdatedAt,
+			&course.IsActive,
+			&course.TechnologyName,
+			&course.TechnologyImage,
+			&course.InstructorName,
+			&course.InstructorImage,
+			&course.CategoryName,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error al escanear curso: %v", err)
+		}
+		courses = append(courses, &course)
+	}
+
+	return courses, nil
+}
+
+// SearchWithRelations busca cursos con filtros y datos relacionados
+func (ps *PostgreSQL) SearchWithRelations(keyword string, categoryID *int, technologyID *int, level *string, minRating *float64) ([]*entities.CourseWithRelations, error) {
+	query := `
+		SELECT 
+			c.id, 
+			c.name_course, 
+			c.description, 
+			c.level, 
+			c.image_url, 
+			c.total_modules, 
+			c.average_rating, 
+			c.total_ratings, 
+			c.duration_hours, 
+			c.created_at, 
+			c.updated_at, 
+			c.is_active,
+			t.name AS technology_name,
+			t.icon AS technology_image,
+			CONCAT(u.first_name, ' ', u.last_name) AS instructor_name,
+			u.profile_photo AS instructor_image,
+			cat.name AS category_name
+		FROM courses c
+		INNER JOIN technologies t ON c.technology_id = t.id
+		INNER JOIN users u ON c.instructor_id = u.id
+		INNER JOIN categories cat ON c.category_id = cat.id
+		WHERE c.is_active = true
+	`
+
+	args := []interface{}{}
+	argPosition := 1
+
+	if keyword != "" {
+		query += fmt.Sprintf(" AND (LOWER(c.name_course) LIKE $%d OR LOWER(c.description) LIKE $%d)", argPosition, argPosition)
+		args = append(args, "%"+strings.ToLower(keyword)+"%")
+		argPosition++
+	}
+
+	if categoryID != nil {
+		query += fmt.Sprintf(" AND c.category_id = $%d", argPosition)
+		args = append(args, *categoryID)
+		argPosition++
+	}
+
+	if technologyID != nil {
+		query += fmt.Sprintf(" AND c.technology_id = $%d", argPosition)
+		args = append(args, *technologyID)
+		argPosition++
+	}
+
+	if level != nil && *level != "" {
+		query += fmt.Sprintf(" AND c.level = $%d", argPosition)
+		args = append(args, *level)
+		argPosition++
+	}
+
+	if minRating != nil {
+		query += fmt.Sprintf(" AND c.average_rating >= $%d", argPosition)
+		args = append(args, *minRating)
+	}
+
+	query += " ORDER BY c.average_rating DESC, c.created_at DESC"
+
+	rows, err := ps.conn.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("error al buscar cursos: %v", err)
+	}
+	defer rows.Close()
+
+	var courses []*entities.CourseWithRelations
+	for rows.Next() {
+		var course entities.CourseWithRelations
+		err := rows.Scan(
+			&course.ID,
+			&course.NameCourse,
+			&course.Description,
+			&course.Level,
+			&course.ImageURL,
+			&course.TotalModules,
+			&course.AverageRating,
+			&course.TotalRatings,
+			&course.DurationHours,
+			&course.CreatedAt,
+			&course.UpdatedAt,
+			&course.IsActive,
+			&course.TechnologyName,
+			&course.TechnologyImage,
+			&course.InstructorName,
+			&course.InstructorImage,
+			&course.CategoryName,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error al escanear curso: %v", err)
+		}
+		courses = append(courses, &course)
+	}
+
+	return courses, nil
+}
