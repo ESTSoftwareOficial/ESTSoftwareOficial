@@ -12,6 +12,7 @@ func ConfigureLessonRoutes(
 	createLessonCtrl *controllers.CreateLessonController,
 	getAllLessonsCtrl *controllers.GetAllLessonsController,
 	getLessonByIdCtrl *controllers.GetLessonByIdController,
+	getLessonDetailCtrl *controllers.GetLessonDetailController,
 	getLessonsByModuleCtrl *controllers.GetLessonsByModuleController,
 	updateLessonCtrl *controllers.UpdateLessonController,
 	deleteLessonCtrl *controllers.DeleteLessonController,
@@ -21,6 +22,7 @@ func ConfigureLessonRoutes(
 	{
 		// Rutas públicas
 		lessonGroup.GET("", getAllLessonsCtrl.Execute)
+		lessonGroup.GET("/:id/detail", getLessonDetailCtrl.Execute)
 		lessonGroup.GET("/:id", getLessonByIdCtrl.Execute)
 		lessonGroup.GET("/module/:moduleId", getLessonsByModuleCtrl.Execute)
 
