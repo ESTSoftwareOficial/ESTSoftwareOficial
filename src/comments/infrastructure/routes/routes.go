@@ -16,7 +16,7 @@ func ConfigureCommentRoutes(
 	likeCommentCtrl *controllers.LikeCommentController,
 	unlikeCommentCtrl *controllers.UnlikeCommentController,
 ) {
-	// Comentarios de lección
+	// Comentarios en lección
 	router.POST("/lessons/:id/comments", security.JWTMiddleware(), createCommentCtrl.Execute)
 	router.GET("/lessons/:id/comments", getLessonCommentsCtrl.Execute)
 
