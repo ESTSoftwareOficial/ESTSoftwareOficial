@@ -3,6 +3,8 @@ package main
 import (
 	categoryInfrastructure "estsoftwareoficial/src/categories/infrastructure"
 	categoryRoutes "estsoftwareoficial/src/categories/infrastructure/routes"
+	commentsInfrastructure "estsoftwareoficial/src/comments/infrastructure"
+	commentsRoutes "estsoftwareoficial/src/comments/infrastructure/routes"
 	"estsoftwareoficial/src/core/bunny"
 	"estsoftwareoficial/src/core/cloudinary"
 	courseRatingInfrastructure "estsoftwareoficial/src/course_ratings/infrastructure"
@@ -40,6 +42,7 @@ func main() {
 	lessonDeps := lessonInfrastructure.InitLessons()
 	lessonResourceDeps := lessonResourceInfrastructure.InitLessonResources()
 	courseRatingDeps := courseRatingInfrastructure.InitCourseRatings()
+	commentsDeps := commentsInfrastructure.InitComments()
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
@@ -142,6 +145,16 @@ func main() {
 		courseRatingDeps.GetCourseRatingByUserAndCourseController,
 		courseRatingDeps.UpdateCourseRatingController,
 		courseRatingDeps.DeleteCourseRatingController,
+	)
+
+	commentsRoutes.ConfigureCommentRoutes(
+		router,
+		commentsDeps.CreateCommentController,
+		commentsDeps.GetLessonCommentsController,
+		commentsDeps.UpdateCommentController,
+		commentsDeps.DeleteCommentController,
+		commentsDeps.LikeCommentController,
+		commentsDeps.UnlikeCommentController,
 	)
 
 	log.Println("Servidor corriendo en http://localhost:8080")
