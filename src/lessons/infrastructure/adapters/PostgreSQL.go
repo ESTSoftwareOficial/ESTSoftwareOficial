@@ -234,3 +234,97 @@ func (ps *PostgreSQL) UpdateOrderIndex(id int, orderIndex int) error {
 
 	return nil
 }
+
+// GetDetailByID obtiene el detalle completo de una lección con JOINs
+func (ps *PostgreSQL) GetDetailByID(id int) (*entities.LessonDetail, error) {
+	// Obtiene datos básicos de la lección + instructor + contadores
+	query := `
+		SELECT 
+			l.id,
+			l.title,
+			COALESCE(l.bunny_video_id, '') AS video_url,
+			COALESCE(l.description, '') AS description,
+			l.created_at,
+			CONCAT(u.first_name, ' ', u.last_name) AS instructor_name,
+			u.job_title,
+			u.profile_photo,
+			u.github_url,
+			u.linkedin_url,
+			u.facebook_url,
+			u.x_url,
+			u.youtube_url,
+			u.instagram_url,
+			u.portfolio_url,
+			COALESCE((SELECT COUNT(*) FROM module_likes ml WHERE ml.module_id = l.module_id), 0) AS likes_count,
+			COALESCE((SELECT COUNT(*) FROM lesson_comments lc WHERE lc.lesson_id = l.id), 0) AS comments_count
+		FROM lessons l
+		INNER JOIN modules m ON l.module_id = m.id
+		INNER JOIN courses c ON m.course_id = c.id
+		INNER JOIN users u ON c.instructor_id = u.id
+		WHERE l.id = $1
+	`
+
+	var lesson entities.LessonDetail
+	err := ps.conn.QueryRow(query, id).Scan(
+		&lesson.ID,
+		&lesson.Title,
+		&lesson.VideoURL,
+		&lesson.Description,
+		&lesson.CreatedAt,
+		&lesson.InstructorName,
+		&lesson.InstructorJobTitle,
+		&lesson.InstructorPhoto,
+		&lesson.GithubURL,
+		&lesson.LinkedinURL,
+		&lesson.FacebookURL,
+		&lesson.XURL,
+		&lesson.YoutubeURL,
+		&lesson.InstagramURL,
+		&lesson.PortfolioURL,
+		&lesson.LikesCount,
+		&lesson.CommentsCount,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("lección no encontrada")
+		}
+		return nil, fmt.Errorf("error al obtener lección: %v", err)
+	}
+
+	// Obtener recursos de la lección
+	resourcesQuery := `
+		SELECT 
+			lr.id,
+			COALESCE(lr.title, rt.name) AS title,
+			lr.url,
+			COALESCE(rt.icon_url, '') AS icon_url
+		FROM lesson_resources lr
+		INNER JOIN resource_types rt ON lr.resource_type_id = rt.id
+		WHERE lr.lesson_id = $1
+		ORDER BY lr.id
+	`
+
+	rows, err := ps.conn.Query(resourcesQuery, id)
+	if err != nil {
+		return nil, fmt.Errorf("error al obtener recursos: %v", err)
+	}
+	defer rows.Close()
+
+	lesson.Resources = []entities.LessonResource{}
+	for rows.Next() {
+		var resource entities.LessonResource
+		err := rows.Scan(
+			&resource.ID,
+			&resource.Title,
+			&resource.URL,
+			&resource.IconURL,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error al escanear recurso: %v", err)
+		}
+		lesson.Resources = append(lesson.Resources, resource)
+	}
+
+	return &lesson, nil
+}

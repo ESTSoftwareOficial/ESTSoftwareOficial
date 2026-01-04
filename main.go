@@ -120,6 +120,7 @@ func main() {
 		lessonDeps.CreateLessonController,
 		lessonDeps.GetAllLessonsController,
 		lessonDeps.GetLessonByIdController,
+		lessonDeps.GetLessonDetailController,
 		lessonDeps.GetLessonsByModuleController,
 		lessonDeps.UpdateLessonController,
 		lessonDeps.DeleteLessonController,
